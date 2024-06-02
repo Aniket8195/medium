@@ -4,7 +4,6 @@
     "deploy": "wrangler deploy --minify src/index.ts"
   },
   "dependencies": {
-    "@9518aniket/medium-common1": "^1.0.0",
     "@prisma/client": "^5.14.0",
     "@prisma/extension-accelerate": "^1.1.0",
     "hono": "^4.4.0",

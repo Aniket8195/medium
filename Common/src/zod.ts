@@ -1,13 +1,19 @@
 import zod from "zod";
 
-export const userInput=zod.object({
+export const signupInput=zod.object({
     username:zod.string().email(),
     password:zod.string().min(6),
-
+    name:zod.string().optional(),
 })
 
-export type userInput=zod.infer<typeof userInput>
+export type userInput=zod.infer<typeof signupInput>
 
+export const loginInput=zod.object({
+    username:zod.string().email(),
+    password:zod.string().min(6)
+})
+
+export type loginInput=zod.infer<typeof loginInput>
 
 export const postInput=zod.object({
     title:zod.string(),

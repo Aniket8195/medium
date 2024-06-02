@@ -1,5 +1,5 @@
 import {Hono} from "hono";
-import {userInput} from "@9518aniket/medium-common1"
+import { signupInput,loginInput } from "@9518aniket/medium-common1";
 
 export const userRouter=new Hono<{
     Bindings:{
@@ -17,18 +17,20 @@ userRouter.post('/signup', async(c) => {
       datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate())
     const body=await c.req.json();
-    const result=userInput.safeParse(body);
-    if(!result.success){
-      c.status(400)
-      return c.json({
-        error:result.error
-      })
-    }
+    console.log(body);
+    // const result=signupInput.safeParse(body);
+    // if(!result.success){
+    //   c.status(400)
+    //   return c.json({
+    //     error:result.error
+    //   })
+    // }
     try{
       const user=await prisma.user.create({
         data:{
-          email:body.email,
-          password:body.password
+          email:body.username,
+          password:body.password,
+          name:body.name
         }
       })
       const payload = {
@@ -39,23 +41,29 @@ userRouter.post('/signup', async(c) => {
       const token=await sign(payload,c.env.JWT_SECRET);
       c.status(200)
       return c.json({
+        success:true,
+        message:"User Created",
         jwt:token
       })
     }catch(e:any){
       c.status(400)
       return c.json({
-        error:"User Already Exists"
+          success:false,
+          message:'User Already Exists',
+          jwt:''
       })
     }
     
   })
+
+  
   userRouter.post('/signin',async(c)=>{
     const prisma = new PrismaClient({
       datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate())
     
     const body=await c.req.json();
-    const result=userInput.safeParse(body);
+    const result=loginInput.safeParse(body);
     if(!result.success){
       c.status(400)
       return c.json({
@@ -65,7 +73,7 @@ userRouter.post('/signup', async(c) => {
     const user=await prisma.user.findUnique(
       {
             where:{
-              email:body.email
+              email:body.username
             }
       }
     );
@@ -81,12 +89,16 @@ userRouter.post('/signup', async(c) => {
       )
       c.status(200)
       return c.json({
+        success:true,
+        message:"LOGGED IN",
         jwt:token
       })
     }else{
       c.status(400)
     return c.json({
-        msg:"User Not exists"
+        success:false,
+        message:"User Not exists",
+        jwt:''
   });
     }
     
